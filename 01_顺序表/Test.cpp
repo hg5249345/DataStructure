@@ -1,11 +1,11 @@
 #include <iostream>
+#include <gtest/gtest.h>
+#include <ctime>
 #include "SeqList.h"
 
-#include <ctime>
-#include <gtest/gtest.h>
-#pragma comment(lib,"../gtestd.lib")
-
 using namespace std;
+
+#pragma comment(lib,"../gtestd.lib")
 
 class ElementType;
 ostream& operator<<(ostream& os, ElementType& data);
@@ -90,89 +90,125 @@ ostream& operator<<(ostream& os, ElementType& data)
 //  Gtest
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TEST(SeqList, main)
+TEST(SeqList, Int)
 {
 	/////////////////////////////////////////////////////////////////////
-	// 系统数据类型
-	/////////////////////////////////////////////////////////////////////
+    // 系统数据类型
+    /////////////////////////////////////////////////////////////////////
+
 	SeqList<int> intSeqList(15);
 	ASSERT_TRUE(intSeqList.Length() == 0);
 
+    // 顺序表空时删除失败
+    int tmp = 0;
+    EXPECT_FALSE(intSeqList.RemoveById(3, tmp));
+    EXPECT_FALSE(intSeqList.Remove(tmp));
+    EXPECT_FALSE(intSeqList.RemoveAll(tmp));
+
+    // 初始化顺序表，并验证长度
 	srand(time(0));
 	for(int i=0; i < 14; i++){
 		EXPECT_TRUE(i == intSeqList.Length());
-		EXPECT_TRUE(1 == intSeqList.Insert(rand() % 100, intSeqList.Length()));
+		EXPECT_TRUE(intSeqList.Insert(rand() % 100, intSeqList.Length()));
 	}
-	intSeqList.Print();
+	intSeqList.Print("insert 14 elements");
 
-	EXPECT_TRUE(1 == intSeqList.Insert(rand() % 100, intSeqList.Length()));
-	EXPECT_TRUE(0 == intSeqList.Insert(rand() % 100, intSeqList.Length()));
+    // 插入最后一个元素
+	tmp = rand() % 100;
+	EXPECT_TRUE(intSeqList.Insert(tmp, intSeqList.Length()));
+    intSeqList.Print("insert 14th element");
+
+    // 查找插入的元素(可能有相同的元素)
+	//EXPECT_TRUE(14 == intSeqList.Find(tmp));
+	EXPECT_TRUE(intSeqList.IsElement(tmp));
+
+    // 顺序表已满，无法继续插入
+	EXPECT_FALSE(intSeqList.Insert(rand() % 100, intSeqList.Length()));
+    intSeqList.Print("full, can't insert");
+
+    // 获取第5个元素
+    int iGetData = 0;
+    EXPECT_TRUE(intSeqList.Get(5, iGetData));
+
+    // 删除第5个元素
+	EXPECT_TRUE(intSeqList.Remove(iGetData));
+    intSeqList.Print("after remove");
+
+    // 此时顺序表还有一个位置，插入新元素
+	EXPECT_TRUE(intSeqList.Insert(rand() % 100, intSeqList.Length()));
+    intSeqList.Print("insert after remove");
+
+    // 删除三个元素
+    EXPECT_TRUE(intSeqList.RemoveById(6, tmp));
+    EXPECT_TRUE(intSeqList.RemoveById(3, tmp));
+    EXPECT_TRUE(intSeqList.RemoveById(10, tmp));
+
+    // 在头部插入一个元素
+    tmp = rand() % 100;
+    EXPECT_TRUE(intSeqList.InsertBefore(tmp));
+    iGetData = 0;
+    EXPECT_TRUE(intSeqList.Get(0, iGetData));
+    EXPECT_TRUE(tmp == iGetData);
+    intSeqList.Print("insert a element before list");
+
+    // 在尾部插入一个元素
+    tmp = rand() % 100;
+    EXPECT_TRUE(intSeqList.InsertAfter(tmp));
+    iGetData = 0;
+    EXPECT_TRUE(intSeqList.Get(intSeqList.Length()-1, iGetData));
+    EXPECT_TRUE(tmp == iGetData);
+    intSeqList.Print("insert a element after list");
+}
 
 
+TEST(SeqList, ElementType)
+{
+    /////////////////////////////////////////////////////////////////////
+    // 自定义数据类型
+    /////////////////////////////////////////////////////////////////////
 
+	SeqList<ElementType> elementSeqList(3);
+    elementSeqList.Print();
+    EXPECT_TRUE(0 == elementSeqList.Length());
+	
+    // 连续插入3个元素
+	ElementType tmp1(1,2);
+	EXPECT_TRUE(elementSeqList.Insert(tmp1,0));
 
-	/*
-	test.Insert(1,0);
-	test.Print();
+	ElementType tmp2(3,4);
+	EXPECT_TRUE(elementSeqList.Insert(tmp2,1));
 
-	cout << (test.Find(0)?"can't be found ":"Be found ") << 0 << endl <<endl;
-	test.Remove(7);
-	test.Print();
-	test.Remove(9);
-	test.Print();
-	test.Remove(0);
-	test.Print();
-	*/
-	/////////////////////////////////////////////////////////////////////
-	// 自定义数据类型
-	/////////////////////////////////////////////////////////////////////
+	ElementType tmp3(5,6);
+	EXPECT_TRUE(elementSeqList.Insert(tmp3,2));
+    EXPECT_TRUE(3 == elementSeqList.Length());
 
+    elementSeqList.Print("insert 3 elements");
+
+    // 顺序表已满，无法插入
+	ElementType tmp4(7,8);
+	EXPECT_FALSE(elementSeqList.Insert(tmp4,2));
+
+    EXPECT_TRUE(elementSeqList.IsElement(tmp2));
+	EXPECT_TRUE(elementSeqList.Remove(tmp2));
+    EXPECT_FALSE(elementSeqList.IsElement(tmp2));
+    EXPECT_TRUE(2 == elementSeqList.Length());
+    elementSeqList.Print("remove an element");
+
+    ElementType eRemoveData;
+    EXPECT_TRUE(elementSeqList.RemoveById(1,eRemoveData));
+    EXPECT_TRUE(1 == elementSeqList.Length());
+    elementSeqList.Print("remove an element by id");
+
+    // 顺序表未满，可以插入
+	EXPECT_TRUE(elementSeqList.Insert(tmp4,1));
+    EXPECT_TRUE(2 == elementSeqList.Length());
+    elementSeqList.Print("insert an element");
 }
 
 int main(int argc, char** argv)
 {
-	/*
-	SeqList<int> test(15);
-	int array[]={2,5,8,1,9,9,7,6,4,3,2,9,7,7};
-	for(int i=0; i < sizeof(array) / sizeof(int); i++){
-		test.Insert(array[i], test.Length());
-	}
-	test.Print();
-
-	test.Insert(1,0);
-	test.Print();
-
-	cout << (test.Find(0)?"can't be found ":"Be found ") << 0 << endl <<endl;
-	test.Remove(7);
-	test.Print();
-	test.Remove(9);
-	test.Print();
-	test.Remove(0);
-	test.Print();
-	*/
-
 	testing::InitGoogleTest(&argc,argv);
 	int r = RUN_ALL_TESTS();
-
-/*
-	//自定义数据类型
-
-	SeqList<ElementType> test(3);
-	ElementType tmp1(2,1);
-	test.Insert(tmp1,0);
-
-	ElementType tmp2(1,2);
-	test.Insert(tmp2,1);
-
-	ElementType tmp3(2,2);
-	test.Insert(tmp3,2);
-
-	test.Print();
-
-	ElementType tmp4(2,1);
-	test.Remove(tmp4);
-	test.Print();
-*/
 
 	return 0;
 }
