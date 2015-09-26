@@ -1,0 +1,21 @@
+#visual studio tmp file
+*.sdf
+*.user
+*.opensdf
+*.log
+*.tlog
+*.pdb
+*.idb
+*.exe
+*.obj
+*.cache
+*.rc
+*.manifest
+*.res
+*.ilk
+*.lastbuildstate
+*.unsuccessfulbuild
+
+/ipch/
+
+Debug/*.log
