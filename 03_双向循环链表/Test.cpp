@@ -1,7 +1,10 @@
 #include <iostream>
+#include <gtest/gtest.h>
 #include "DoubleList.h"
 
 using namespace std;
+
+#pragma comment(lib,"../gtestd.lib")
 
 int main()
 {
