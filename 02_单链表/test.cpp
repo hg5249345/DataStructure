@@ -1,11 +1,15 @@
 #include <iostream>
+#include <gtest/gtest.h>
+
 using namespace std;
 
 #include "SingleList.h"
 
+#pragma comment(lib,"../gtestd.lib")
 
-int main()
+int main(int argc, char** argv)
 {
+	/*
 	SingleList<int> list;
 	for(int i=0; i<20; i++){
 		list.Insert(i*3, i);
@@ -45,7 +49,10 @@ int main()
 
 	list.MakeEmpty();
 	cout<<"the Length of the list is "<<list.Length()<<endl;
-	list.Print();
+	list.Print();*/
+
+	testing::InitGoogleTest(&argc,argv);
+	int r = RUN_ALL_TESTS();
 
 	return 0;
 }
